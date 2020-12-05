@@ -1,6 +1,5 @@
 from domain import parser
-import suser
-import vault
+from internal import suser, vault
 import socket
 import threading
 from queue import Queue
@@ -151,7 +150,7 @@ def decifer_communication(sock,user_data):
         a = CommunicationNode(socket=sock,hooks=None,user_data=user_data)
     a.start()
     a.join()
-def noop():
+def noop(_,_):
     pass
 if __name__ == "__main__":
 # create an INET, STREAMing socket

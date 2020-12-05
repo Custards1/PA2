@@ -1,4 +1,4 @@
-import suser
+from internal import suser
 import threading
 class Vault:
     login_tag = "LOG"
@@ -16,7 +16,7 @@ class Vault:
     def __getitem__(self, item):
         with self._lock:
             return self._storage[item.name]
-    def __setitem__(self, key : suser.SUser, value:suser.SUser):
+    def __setitem__(self, key : suser.SUser, value: suser.SUser):
             if not self.append(key):
                 with self._lock:
                     self._storage[key.name] = value

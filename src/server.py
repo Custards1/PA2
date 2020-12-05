@@ -1,7 +1,6 @@
-import com
+from internal import com, vault
 import threading
 import socket
-import vault
 
 
 class Server:
