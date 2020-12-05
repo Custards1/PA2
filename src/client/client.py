@@ -37,7 +37,7 @@ class BaseClient:
         self._is_connected = False
     def send(self,msg : str):
         try:
-            self._socket.send((msg+'\n').encode())
+            self._socket.send((msg.replace("\n","")+'\n').replace("|","").encode())
             return True
         except:
             self.drop()
