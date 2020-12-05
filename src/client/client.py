@@ -3,7 +3,7 @@ from domain import user, parser
 class BaseClient:
     def __init__(self,host,port):
         self._is_connected = False
-        self._socket.connect((host, port)) #raises error on failure
+    
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._socket.connect((host, port)) #raises error on failure
         self._is_connected = True
