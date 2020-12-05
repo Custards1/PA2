@@ -1,5 +1,6 @@
 import socket
-from domain import user, parser
+from domain import user, parser,base_message
+import threading
 class BaseClient:
     def __init__(self,host,port):
         self._is_connected = False
@@ -45,17 +46,56 @@ class BaseClient:
     @property
     def is_connected(self):
         return self._is_connected
-class RelayClient(BaseClient):
+class RelayClient(BaseClient,threading.Thread):
     def __init__(self,host,port,self_user : user.User):
         super().__init__(host,port)
         self._user = self_user
-        self.login_relay()
+        self._pending = list()
+        self._lock = threading.Lock()
+        if not self.login_relay():
+            self.drop()
     def login_relay(self):
-        #Ill do this later today
-        pass
+        if self.is_connected:
+            if not self.send(parser.build_raw_response_from_list("RUSR",[self._user.name])):
+                return False
+            msg  = self.get_input()
+            if msg is None or msg != "0|Ok":
+                return False
+            return True
+        return False
+    def clear_pending(self):
+        with self._lock:
+            self._pending.clear()
     def get_pending_messages(self)->[]:
-        #Ill do this later today
-        pass
+        with self._lock:
+            return self._pending
+    def add_to_pending(self,msg):
+        with self._lock:
+            self._pending.append(msg)
+
+    def run(self):
+        while True:
+            msg = self.get_input()
+            if msg is not None:
+                (tag,args) = parser.parse_header(msg)
+                if tag == "R":
+                    a = base_message.Message()
+                    if a.from_tag(args) != 3:
+                        if not self.send(parser.build_raw_response(1,"ERR")):
+                            break
+                    else:
+                        self.add_to_pending(a)
+                        if not self.send(parser.build_raw_response(0,"OK")):
+                            break
+                elif tag == "0K":
+                    if not self.send(parser.build_raw_response(0,"Ok")):
+                        break
+                else:
+                    if not self.send(parser.build_raw_response(1,"Bad Request")):
+                        break
+            else:
+                break
+
 
 
 class Client(BaseClient):
@@ -63,7 +103,10 @@ class Client(BaseClient):
         super().__init__(host,port)
         self._user = self_user
         self.login(self._user,create_user)
-        self._relay = RelayClient(host,port,self_user)
+        self._relay = RelayClient(host,port,self._user)
+        if not self._relay.is_connected:
+            self.drop()
+        self._relay.start()
 
     def login(self,create_user = True):
         #TODO implement login, throw error on failure
@@ -87,4 +130,7 @@ class Client(BaseClient):
             while i := msgs.pop() and i is not None:
                 print(i)
         pass
-
+    def drop(self):
+        self._relay.drop()
+        self._relay.join()
+        super().drop()

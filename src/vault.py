@@ -20,6 +20,9 @@ class Vault:
             if not self.append(key):
                 with self._lock:
                     self._storage[key.name] = value
+    def get(self,name : str):
+        with self._lock:
+            return self._storage[name]
     def append(self,user):
         with self._lock:
             print("adding user",user)
@@ -27,6 +30,7 @@ class Vault:
                 self._storage[user.name] = user
                 return True
             return False
+
     @staticmethod
     def build_login_user(vaults,tag):
         r = suser.SUser()

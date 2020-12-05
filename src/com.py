@@ -116,21 +116,28 @@ class CommunicationNode:
         while self._is_connected:
             inv = self.get_input()
             if inv is not None:
-                print("Gottenmesa",inv)
+                print("",inv)
                 self.parse(inv)
-        print("Nono")
+        print("")
         self.drop_connection()
 class CommunicationNodeRelay(CommunicationNode):
     def __init__(self,socket=None,hooks = None,user_data=None):
         super.__init__(socket,hooks,user_data)
         self._pending = Queue()
         self._lock = threading.Lock()
-    def add_pending(self,msg):
+    def add_pending(self,msg,to_user):
         with self._lock:
-            self._pending.put(msg)
-    def pop_pending(self):
+            self.user_data.get(to_user).history.append(msg)
+    def get_pending(self):
         with self._lock:
-            return self._pending.get()
+            return self.user_data[self.connected_user].history
+    def any_pending(self) ->bool:
+        with self._lock:
+            return len(self.user_data[self.connected_user].history) != 0
+    def clear_pending(self):
+        with self._lock:
+            self.user_data[self.connected_user].history = list()
+
 
 if __name__ == "__main__":
 # create an INET, STREAMing socket
