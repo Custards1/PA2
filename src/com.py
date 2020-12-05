@@ -1,5 +1,4 @@
-import socket as sock
-import parser
+from domain import parser
 import suser
 import vault
 import socket
@@ -91,7 +90,7 @@ class CommunicationNode:
         (a,b,(c,d)) = self.run_hook(str(hook),[str(ele) for ele in args])
         print("a =",a,",b =",b,",c =",c,",d =",d)
         if c is not None and d is not None:
-           if not self._send(parser.build_raw_response(c,d)):
+           if not self._send(parser.build_raw_response(c, d)):
                print("Failed to send")
                self.drop_connection()
                return False
