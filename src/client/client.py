@@ -1,5 +1,5 @@
 import socket
-from domain import user, parser,base_message
+from domain import user, parser, base_message
 import threading
 class BaseClient:
     def __init__(self,host,port):
@@ -38,7 +38,7 @@ class BaseClient:
         self._is_connected = False
     def send(self,msg : str):
         try:
-            self._socket.send((msg.replace("\n","")+'\n').replace("|","").encode())
+            self._socket.send((msg.replace("\n","")+'\n').encode())
             return True
         except:
             self.drop()

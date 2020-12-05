@@ -11,10 +11,10 @@ def parse_header(msg : str):
 
     return (head,res)
 def build_raw_response(number:int,string:str):
-    return str(number)+'|'+string
+    return str(number)+'|'+string.replace("|","")
 def build_raw_response_from_list(tag,args):
-    res = str(tag)+'|'+tag+'|'
+    res = str(tag).replace("|","")+'|'
     for i in args:
-        res += i+'|'
+        res += i.replace("|","")+'|'
     res += '\n'
     return res
