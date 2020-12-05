@@ -1,10 +1,10 @@
 import socket
 from domain import user, parser, base_message
 import threading
-class BaseClient:
+class BaseClient(threading.Thread):
     def __init__(self,host,port):
+        super().__init__()
         self._is_connected = False
-    
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._socket.connect((host, port)) #raises error on failure
         self._is_connected = True
@@ -36,7 +36,7 @@ class BaseClient:
             except IOError:
                 pass
         self._is_connected = False
-    def send(self,msg : str):
+    def send(self,msg):
         try:
             self._socket.send((msg.replace("\n","")+'\n').encode())
             return True
@@ -46,23 +46,22 @@ class BaseClient:
     @property
     def is_connected(self):
         return self._is_connected
-class RelayClient(BaseClient,threading.Thread):
-    def __init__(self,host,port,self_user : user.User):
+class RelayClient(BaseClient):
+    def __init__(self,host,port,user : user.User):
         super().__init__(host,port)
-        self._user = self_user
+        self._user = user
         self._pending = list()
         self._lock = threading.Lock()
         if not self.login_relay():
+            print("Failed loggin in")
             self.drop()
     def login_relay(self):
-        if self.is_connected:
-            if not self.send(parser.build_raw_response_from_list("RUSR",[self._user.name])):
-                return False
-            msg  = self.get_input()
-            if msg is None or msg != "0|Ok":
-                return False
-            return True
-        return False
+        if not self.send(parser.build_raw_response_from_list("RUSR",[self._user.name])):
+            return False
+        msg  = self.get_input()
+        if msg is None or msg != "0|Ok":
+            return False
+        return True
     def clear_pending(self):
         with self._lock:
             self._pending.clear()
@@ -99,13 +98,11 @@ class RelayClient(BaseClient,threading.Thread):
 
 
 class Client(BaseClient):
-    def __init__(self,host,port,self_user : user.User,create_user=True):
+    def __init__(self,host,port,user : user.User,create_user=True):
         super().__init__(host,port)
-        self._user = self_user
-        self.login(self._user,create_user)
+        self._user = user
+        self.login(create_user)
         self._relay = RelayClient(host,port,self._user)
-        if not self._relay.is_connected:
-            self.drop()
         self._relay.start()
 
     def login(self,create_user = True):
@@ -120,7 +117,7 @@ class Client(BaseClient):
         if tag != "0" and args !=["Ok"]:
             raise ValueError
         pass
-    def send_message(self):
+    def send_message(self,msg: base_message.Message):
         #TODO implement login, throw error on failure
         pass
     def print_pending(self):

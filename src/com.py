@@ -24,6 +24,7 @@ class CommunicationNode(threading.Thread):
             self.user_data = user_data
         self.add_hook(suser.SUser.tag, suser.SUser.build, vault.Vault.user_creation_hook)
         self.add_hook(vault.Vault.login_tag, vault.Vault.build_login_user)
+        self.add_hook("RUSR",noop)
     def is_user(self,user):
         return self.connected_user == user
     def get_input(self):
@@ -126,7 +127,7 @@ class CommunicationNode(threading.Thread):
         self.drop_connection()
 class CommunicationNodeRelay(CommunicationNode):
     def __init__(self,socket=None,hooks = None,user_data=None):
-        super.__init__(socket,hooks,user_data)
+        super().__init__(socket,hooks,user_data)
         self._pending = Queue()
         self._lock = threading.Lock()
     def add_pending(self,msg,to_user):
@@ -150,7 +151,8 @@ def decifer_communication(sock,user_data):
         a = CommunicationNode(socket=sock,hooks=None,user_data=user_data)
     a.start()
     a.join()
-
+def noop():
+    pass
 if __name__ == "__main__":
 # create an INET, STREAMing socket
     serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
