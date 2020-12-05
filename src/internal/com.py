@@ -150,7 +150,7 @@ def decifer_communication(sock,user_data):
         a = CommunicationNode(socket=sock,hooks=None,user_data=user_data)
     a.start()
     a.join()
-def noop(_,_):
+def noop(_,_v):
     pass
 if __name__ == "__main__":
 # create an INET, STREAMing socket
