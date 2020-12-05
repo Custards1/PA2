@@ -24,6 +24,7 @@ class Vault:
         with self._lock:
             return self._storage[name]
     def append(self,user):
+        print("Callin append")
         with self._lock:
             print("adding user",user)
             if user.name not in self._storage:

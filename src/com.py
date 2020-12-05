@@ -5,8 +5,9 @@ import socket
 import threading
 from queue import Queue
 addr = 8084
-class CommunicationNode:
+class CommunicationNode(threading.Thread):
     def __init__(self,socket=None,hooks = None,user_data=None):
+        super().__init__()
         if socket is None:
             self._is_connected = False
         else:
@@ -21,6 +22,8 @@ class CommunicationNode:
             self.user_data = vault.Vault()
         else:
             self.user_data = user_data
+        self.add_hook(suser.SUser.tag, suser.SUser.build, vault.Vault.user_creation_hook)
+        self.add_hook(vault.Vault.login_tag, vault.Vault.build_login_user)
     def is_user(self,user):
         return self.connected_user == user
     def get_input(self):
@@ -56,9 +59,10 @@ class CommunicationNode:
             self._is_connected = False;
             return False
     def _send(self,msg):
-        print("In send")
+        a  =(msg.replace('\n','') + '\n').encode()
+        print("In send ",a)
         try:
-            self._socket.send(msg.encode())
+            self._socket.send(a)
             print("sent",msg)
             return True
         except:
@@ -137,7 +141,15 @@ class CommunicationNodeRelay(CommunicationNode):
     def clear_pending(self):
         with self._lock:
             self.user_data[self.connected_user].history = list()
-
+def decifer_communication(sock,user_data):
+    first_msg = sock.recv(4, socket.MSG_PEEK)
+    a = None
+    if first_msg == "RUSR":
+        a = CommunicationNodeRelay(socket=sock,hooks=None,user_data=user_data)
+    else:
+        a = CommunicationNode(socket=sock,hooks=None,user_data=user_data)
+    a.start()
+    a.join()
 
 if __name__ == "__main__":
 # create an INET, STREAMing socket
@@ -149,7 +161,6 @@ if __name__ == "__main__":
     (sock,_ )= serversocket.accept()
     sock.setblocking(True)
     a = CommunicationNode(socket=sock)
-    a.add_hook(suser.SUser.tag,suser.SUser.build,vault.Vault.user_creation_hook)
-    a.add_hook(vault.Vault.login_tag,vault.Vault.build_login_user)
+
     a.run()
 

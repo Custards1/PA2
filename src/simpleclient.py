@@ -1,19 +1,21 @@
 import socket
-addr = 8084
-def get_input(socket):
+addr = 8080
+def get_input(sock):
         print("getting input")
         line = bytes()
         while True:
             part = None
             try:
                 print("Before")
-                part = socket.recv(1)
-                print("After",part)
+                part = sock.recv(1)
+                print("After ok",part)
             except:
                 print("After",part)
+
                 break
             if part is None or part == b'':
                 print("After",part)
+
                 break
             else:
                 if part != b'\n':
@@ -25,10 +27,9 @@ def get_input(socket):
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sock.connect((socket.gethostname(),addr))
 sock.setblocking(True)
-print("sending input:","USR|blake|gggg|custards")
-sock.send(b"USR|blake|gggg|custards\n")
+print("sending input:","USR|blake|gggg|custards",sock.send(b"USR|blake|gggg|custards\n"))
 print(get_input(sock))
-print("sending input:","LOG|blake|gggg")
-sock.send(b"LOG|blake|gggg\n")
+print("sending input:","LOG|blake|gggg",sock.send(b"LOG|blake|gggg\n"))
+
 print(get_input(sock))
 
