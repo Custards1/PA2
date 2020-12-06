@@ -5,7 +5,7 @@ class Message:
         self.msg = msg
         self.id = id
     def __str__(self):
-        return "{ user_to:'"+str(self.usr_to) +"' user_from:'"+str(self.usr_to) +"' message:'"+self.msg+"' }"
+        return "{ user_to:'"+str(self.usr_to) +"' user_from:'"+str(self.usr_from) +"' message:'"+self.msg+"' }"
     def __repr__(self):
         return self.__str__()
     def from_tag(self,taga):
