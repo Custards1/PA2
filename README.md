@@ -1,14 +1,14 @@
 # PA2
 Blake Brown, Elie Schooley
-#Description
+# Description
 Client-Server multithreading system for a messaging system
-#Files
-##src
+# Files
+## src
 ### Name: client.py
     Description: Main call for client.
 ### Name: server.py
     Description: Main call for server.
-##domain
+## domain
 ### Name: base_message.py
     Description: 
 ### Name: client.py
@@ -19,7 +19,7 @@ Client-Server multithreading system for a messaging system
     Description: formating for protocal
 ### Name: user.py
     Description: users for the client
-##internal
+## internal
 ### Name: com.py
     Description: 
 ### Name: conversation.py
