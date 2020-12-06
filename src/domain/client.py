@@ -103,15 +103,23 @@ class Client(BaseClient):
         self._user = user
         self.login(create_user)
         self._relay = RelayClient(host,port,self._user)
+        self._relay.daemon = True
         self._relay.start()
 
     def make_user(self):
         #Make a USR|..|..|.. request
-        if not self.send(parser.build_raw_response_from_list("USR"), #add rest of request as list
-                      ):
+        if not self.send(parser.build_raw_response_from_list("USR", [self._user.name, self._user.password,
+                                                                     self._user.display_name])):
             raise ValueError
         #get input
-        self.get_input()
+        msg = self.get_input()
+        if msg is None:
+            print("msg is None")
+            raise ValueError
+        (tag, args) = parser.parse_header(msg)
+        if tag != "0":
+            print(args)
+            raise ValueError
         #validate the input is what you wantm
         # this function parses it for you parser.parse_header
         pass
@@ -119,6 +127,19 @@ class Client(BaseClient):
         #Make a log request
         #get input,
         #validate input
+        if not self.send(parser.build_raw_response_from_list("LOG", [self._user.name, self._user.password])):
+            raise ValueError
+        msg = self.get_input()
+        if msg is None:
+            print("msg is None")
+            raise ValueError
+        (tag, args) = parser.parse_header(msg)
+        if tag == "1":
+            print("Invalid credentials")
+            raise ValueError
+        if tag == "2":
+            print("Already logged in")
+            raise ValueError
         pass
     def login(self,create_user = True):
         #TODO implement login, throw error on failure
@@ -128,11 +149,24 @@ class Client(BaseClient):
             return self.login_as_user()
         #on error throw error
         pass
-    def send_message(self,msg: base_message.Message):
+    def send_message(self, user_to, msg):
         #Send a MSG|..|..|.. request
         #get input
         #validate input
         #raise error if one
+        if not self.send(parser.build_raw_response_from_list("MSG", [self._user.name, user_to, msg])):
+            raise ValueError
+        msg = self.get_input()
+        if msg is None:
+            print("msg is None")
+            raise ValueError
+        (tag, args) = parser.parse_header(msg)
+        if tag == "1":
+            print("no source user")
+            raise ValueError
+        if tag == "2":
+            print("no target user")
+            raise ValueError
         pass
     def print_pending(self):
         msgs = self._relay.get_pending_messages()
