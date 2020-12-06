@@ -103,6 +103,7 @@ class Client(BaseClient):
         self._user = user
         self.login(create_user)
         self._relay = RelayClient(host,port,self._user)
+        self._relay.daemon = True
         self._relay.start()
 
     def login(self,create_user = True):
@@ -125,7 +126,7 @@ class Client(BaseClient):
             print("msg is None")
             raise ValueError
         (tag,args) = parser.parse_header(msg)
-        if tag != "0" and args !=["Ok"]:
+        if tag != "0":
             print("tag is",tag,"args:",args)
             raise ValueError
         pass
