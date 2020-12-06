@@ -177,6 +177,7 @@ class Client(BaseClient):
     def print_pending(self):
         msgs = self._relay.get_pending_messages()
         msgs.usr_to = self._user.name
+        self._relay.clear_pending()
         print(msgs)
         pass
     def drop(self):
