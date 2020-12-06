@@ -134,6 +134,9 @@ class Client(BaseClient):
     def print_pending(self):
         #TODO implement print_pending, throw error on failure
         msgs = self._relay.get_pending_messages()
+        for i in msgs:
+            i.usr_to =self._user.name
+        self._relay.clear_pending()
         print(msgs)
         pass
     def drop(self):
