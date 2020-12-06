@@ -103,6 +103,7 @@ class Client(BaseClient):
         self._user = user
         self.login(create_user)
         self._relay = RelayClient(host,port,self._user)
+        self._relay.daemon = True
         self._relay.start()
 
     def make_user(self):
