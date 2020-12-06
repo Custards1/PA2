@@ -108,7 +108,7 @@ class Client(BaseClient):
     def login(self,create_user = True):
         #TODO implement login, throw error on failure
         #Dont use this in final, this is just example of what to do
-        if not self.send("USR|%s|%s|$s".format(self._user.name,self._user.password,self._user.display_name)):
+        if not self.send("USR|%s|%s|%s".format(self._user.name,self._user.password,self._user.display_name)):
             raise ValueError
         msg = self.get_input()
         if msg is None:

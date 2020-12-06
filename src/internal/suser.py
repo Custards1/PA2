@@ -2,8 +2,14 @@ import domain.user as ouser
 
 class SUser(ouser.User):
     tag = "USR"
+
     def __init__(self,name=None,password=None,display_name=None,history=None):
         super().__init__(name,password,display_name,history)
+    def __str__(self):
+        msg = "{ name: "+self.name+', password:'+self.password+', display_name:'+self.display_name+'history:'+self.history.__str__() + " }"
+        return msg
+    def __repr__(self):
+        return self.__str__()
     @staticmethod
     def build(_,tag):
         r = SUser()

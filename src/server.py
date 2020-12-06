@@ -11,19 +11,17 @@ class Server:
         self._socket = None
         self._user_data = user_data
         self._threads = list()
-
     def start(self):
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._socket.bind((self._host, self._port))
         self._socket.listen(self._backlog)
         while True:
             (con, addr) = self._socket.accept()
-            print("Got sum on", addr)
+            print("Got sum on", addr,self._user_data)
             t = threading.Thread(target=com.decifer_communication, args=(con, self._user_data,))
             self._threads.append(t)
             t.start()
 
-
 if __name__ == "__main__":
-    coms = Server()
+    coms = Server(port=8095)
     coms.start()

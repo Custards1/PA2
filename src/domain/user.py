@@ -3,7 +3,10 @@ class User:
         self._name = name
         self._password = password
         self._display_name = display_name
-        self._history = history
+        if history is None:
+            self._history = list()
+        else:
+            self._history = history
         self._logged_in = False
     @property
     def logged_in(self):
@@ -19,7 +22,7 @@ class User:
         return self._display_name
     @property
     def history(self):
-        return self._display_name
+        return self._history
     @name.setter
     def name(self,msg : str):
         self._name = msg

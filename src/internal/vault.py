@@ -20,18 +20,25 @@ class Vault:
             if not self.append(key):
                 with self._lock:
                     self._storage[key.name] = value
+    def __str__(self):
+        return self._storage.__str__()
     def get(self,name : str):
         with self._lock:
-            return self._storage[name]
+            try:
+                return self._storage[name]
+            except:
+                return None
     def append(self,user):
-        print("Callin append")
+        print("Callin append",self.__str__())
         with self._lock:
             print("adding user",user)
             if user.name not in self._storage:
                 self._storage[user.name] = user
+                print("Callin appender",self.__str__())
                 return True
             return False
-
+    def exists(self,name):
+        return self.get(name) == None
     @staticmethod
     def build_login_user(vaults,tag):
         r = suser.SUser()
