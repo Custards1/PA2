@@ -27,7 +27,7 @@ class Menu:
             a = self.print_menu()
             choice = int(input())
             if a is None and (choice != 1 and choice !=2):
-                print("You must connect to a server first!")
+                print("You must connect to a server first and log in!")
                 continue
             if choice == 1:#connect to the server
                 self._host = input("Hostname: ")
