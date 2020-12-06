@@ -19,6 +19,8 @@ class Menu:
         if not self._is_ok:
             print("Not connected")
             return None
+        else:
+            print("User:",self._user.display_name)
         return True
     def run_menu(self):#remove client and user perams and create them in the function
 
