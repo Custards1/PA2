@@ -15,7 +15,7 @@ class Menu:
             print("disconnected, invalid connection attempt")
             return None
         print("1. Connect to server\n2. Login\n3. Send Message\n4. Print Received Messages\n5. Disconnect")
-
+        return True
     def run_menu(self):#remove client and user perams and create them in the function
 
         choice = 0
