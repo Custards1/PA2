@@ -117,9 +117,11 @@ class Client(BaseClient):
             print("msg is None")
             raise ValueError
         (tag, args) = parser.parse_header(msg)
+        if tag == "0":
+            return True
         if tag != "0":
             print(args)
-            raise ValueError
+            return False
         #validate the input is what you wantm
         # this function parses it for you parser.parse_header
         pass
@@ -134,12 +136,14 @@ class Client(BaseClient):
             print("msg is None")
             raise ValueError
         (tag, args) = parser.parse_header(msg)
+        if tag == "0":
+            return True
         if tag == "1":
             print("Invalid credentials")
-            raise ValueError
+            return False
         if tag == "2":
             print("Already logged in")
-            raise ValueError
+            return False
         pass
     def login(self,create_user = True):
         #TODO implement login, throw error on failure
@@ -161,12 +165,14 @@ class Client(BaseClient):
             print("msg is None")
             raise ValueError
         (tag, args) = parser.parse_header(msg)
+        if tag == "0":
+            return True
         if tag == "1":
             print("no source user")
-            raise ValueError
+            return False
         if tag == "2":
             print("no target user")
-            raise ValueError
+            return False
         pass
     def print_pending(self):
         msgs = self._relay.get_pending_messages()
