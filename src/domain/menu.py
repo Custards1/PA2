@@ -2,13 +2,15 @@
 from domain import user,client
 class Menu:
     def __init__(self,user=None,host=None,port=None,create_user = True):
-        self.startup(user,host,port,create_user)
-    def startup(self,user,host,port,create_user = True):
+        self._host = host
+        self._port = port
+        self.startup(user,create_user)
+    def startup(self,user,create_user = True):
         self._is_ok = False
         self._client = None
-        if host is not None and port is not None and user is not None:
+        if self._host is not None and self._port is not None and user is not None:
             try:
-                self._client = client.Client(host,port,user,create_user)
+                self._client = client.Client(self._host,self._port,user,create_user)
                 self._is_ok = True
             except:
                 pass
@@ -24,25 +26,21 @@ class Menu:
         while choice != 5:
             a = self.print_menu()
             choice = int(input())
-            if a is None and choice != 1:
+            if a is None and (choice != 1 and choice !=2):
                 print("You must connect to a server first!")
                 continue
             if choice == 1:#connect to the server
-                host = input("Hostname: ")
-                port = int(input("Port: "))
-                name = input("username: ")
-                password = input("password: ")
-                display_name = input("display_name: ")
-                create_user = input("Enter 1 to create new user, anything else to just login: ")
-                create_user = create_user == "1"
-                self.startup(user.User(name,password,display_name),host,port)
+                self._host = input("Hostname: ")
+                self._port = int(input("Port: "))
                 pass
             elif choice == 2:
                 print("What is your username?")
                 username = input()
                 print("What is your password?")
                 password = input()
-                self._client.login()#pass argument
+                display_name = input("display_name: ")
+                create_user = int(input("Enter 1 to create a new user, anything else to login as existing: ")) == 1
+                self.startup(user.User(username,password,display_name),create_user)
             elif choice == 3:
                 print("Who are you messaging?")
                 username_to = input()
