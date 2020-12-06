@@ -23,5 +23,5 @@ class Server:
             t.start()
 
 if __name__ == "__main__":
-    coms = Server(port=8095)
+    coms = Server(port=8094)
     coms.start()

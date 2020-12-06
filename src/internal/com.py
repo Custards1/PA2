@@ -8,14 +8,14 @@ addr = 8084
 
 
 class CommunicationNode(threading.Thread):
-    def __init__(self, socket=None, hooks=None, user_data=None):
+    def __init__(self, socket=None, hooks=None, user_data=None,connected_user=None):
         super().__init__()
         if socket is None:
             self._is_connected = False
         else:
             self._is_connected = True
         self._socket = socket
-        self.connected_user = None
+        self.connected_user = connected_user
         if hooks is None:
             self._hooks = dict()
         else:
@@ -143,11 +143,12 @@ class CommunicationNode(threading.Thread):
 
 
 class CommunicationNodeRelay(CommunicationNode):
-    def __init__(self, socket=None, hooks=None, user_data=None):
+    def __init__(self, socket=None, hooks=None, user_data=None,username = None):
         super().__init__(socket, hooks, user_data)
         self._pending = Queue()
         self._lock = threading.Lock()
         self._runnable = True
+        self._username= username
 
     def add_pending(self, msg, to_user):
         print("Addin pendin")
@@ -175,24 +176,35 @@ class CommunicationNodeRelay(CommunicationNode):
             self.drop_connection()
 
     def run(self):
-        name = self.connected_user.name
+        print("meesa waitins baskins")
         while self._runnable:
-            while len(ab := self.user_data.get(name).history) == 0:
+            msg = self.get_input()
+            if msg is None:
+                break
+            (tag,args) = parser.parse_header(msg)
+            if tag == "RUSR":
+                self._username=args[0]
+                self._send(parser.build_raw_response(0,"Ok"))
+            print("meesa waitins")
+            while len(ab := self.user_data.get(self._username).history) == 0:
                 pass
             msg = ab.pop()
-            self._send(parser.build_raw_response("R", str(msg.usr_from.name), str(msg.id), str(msg.msg)))
-            msg = self.get_input()
+            print("sending fra pending",msg)
+            self._send(parser.build_raw_response_from_list("R", [str(msg.usr_from), str(msg.id), str(msg.msg)]))
+
 
 
 def decifer_communication(sock, user_data):
+
     first_msg = sock.recv(4, socket.MSG_PEEK)
+    print("Decifer",user_data,first_msg)
     a = None
-    if first_msg == "RUSR":
+    if first_msg == b'RUSR':
+        print("Makin relayt")
         a = CommunicationNodeRelay(socket=sock, hooks=None, user_data=user_data)
     else:
         a = CommunicationNode(socket=sock, hooks=None, user_data=user_data)
-    a.start()
-    a.join()
+    a.run()
 
 
 def noop(_, _v):

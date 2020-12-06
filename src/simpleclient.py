@@ -139,7 +139,7 @@ class Client(BaseClient):
         super().drop()
         self._relay.drop()
 if __name__ == "__main__":
-    a = Client(socket.gethostname(),8095,user.User(input("name >> "),input("password >> "),input("display name >> ")))
+    a = Client(socket.gethostname(),8094,user.User(input("name >> "),input("password >> "),input("display name >> ")))
     print(a.send_message(input("Who >>"),input("What >>")))
     print("sent")
     a.print_pending()
