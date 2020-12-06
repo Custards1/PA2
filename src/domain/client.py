@@ -105,27 +105,38 @@ class Client(BaseClient):
         self._relay = RelayClient(host,port,self._user)
         self._relay.start()
 
+    def make_user(self):
+        #Make a USR|..|..|.. request
+        if not self.send(parser.build_raw_response_from_list("USR"), #add rest of request as list
+                      ):
+            raise ValueError
+        #get input
+        self.get_input()
+        #validate the input is what you wantm
+        # this function parses it for you parser.parse_header
+        pass
+    def login_as_user(self):
+        #Make a log request
+        #get input,
+        #validate input
+        pass
     def login(self,create_user = True):
         #TODO implement login, throw error on failure
-        #Dont use this in final, this is just example of what to do
-        if not self.send("USR|%s|%s|%s".format(self._user.name,self._user.password,self._user.display_name)):
-            raise ValueError
-        msg = self.get_input()
-        if msg is None:
-            raise ValueError
-        (tag,args) = parser.parse_header(msg)
-        if tag != "0" and args !=["Ok"]:
-            raise ValueError
+        if create_user == True:
+            return self.make_user()
+        else:
+            return self.login_as_user()
+        #on error throw error
         pass
     def send_message(self,msg: base_message.Message):
-        #TODO implement login, throw error on failure
+        #Send a MSG|..|..|.. request
+        #get input
+        #validate input
+        #raise error if one
         pass
     def print_pending(self):
-        #TODO implement print_pending, throw error on failure
         msgs = self._relay.get_pending_messages()
-        if msgs is not None:
-            while i := msgs.pop() and i is not None:
-                print(i)
+        #print out msgs thread safely
         pass
     def drop(self):
         self._relay.drop()
