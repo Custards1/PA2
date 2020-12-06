@@ -41,5 +41,6 @@ class Menu:
                 self._client.print_pending()
             elif choice == 5:
                 self._client.drop()
+                self._is_ok = False
             else:
                 print("Not a valid option")
