@@ -89,7 +89,6 @@ class Vault:
     def to_json(self):
         msg = dict()
         for (j) in self._storage:
-            print(j)
             if isinstance(self._storage[j],suser.SUser):
                 msg[j]= self._storage[j].as_dct()
         return json.dumps(msg)

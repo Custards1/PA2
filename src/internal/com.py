@@ -103,7 +103,6 @@ class CommunicationNode(threading.Thread):
     def _parse(self, msg: str):
         it = 0
         (hook, args) = parser.parse_header(msg)
-        print(str(hook))
 
         (a, b, (c, d)) = self.run_hook(str(hook), [str(ele) for ele in args])
 
@@ -136,9 +135,9 @@ class CommunicationNode(threading.Thread):
         while self._is_connected:
             inv = self.get_input()
             if inv is not None:
-                print("", inv)
+
                 self.parse(inv)
-        print("")
+
         self.drop_connection()
 
 
