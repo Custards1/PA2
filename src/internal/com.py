@@ -186,16 +186,19 @@ class CommunicationNodeRelay(CommunicationNode):
                 self._username=args[0]
                 self._send(parser.build_raw_response(0,"Ok"))
             print("meesa waitins")
-            while len(ab := self.user_data.get(self._username).history) == 0:
+            while len(ab := self.user_data.get(self._username).history) == 0 and self._runnable:
                 pass
+            if not self._runnable:
+                break
             msg = ab.pop()
             print("sending fra pending",msg)
             self._send(parser.build_raw_response_from_list("R", [str(msg.usr_from), str(msg.id), str(msg.msg)]))
 
+    def drop_connection(self):
+        self._runnable = False
+        super().drop_connection()
 
-
-def decifer_communication(sock, user_data):
-
+def decifer_communication(sock, user_data,threads_list):
     first_msg = sock.recv(4, socket.MSG_PEEK)
     print("Decifer",user_data,first_msg)
     a = None
@@ -204,7 +207,9 @@ def decifer_communication(sock, user_data):
         a = CommunicationNodeRelay(socket=sock, hooks=None, user_data=user_data)
     else:
         a = CommunicationNode(socket=sock, hooks=None, user_data=user_data)
-    a.run()
+    a.daemon = True
+    a.start()
+    threads_list.append(a)
 
 
 def noop(_, _v):
