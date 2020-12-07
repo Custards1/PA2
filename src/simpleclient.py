@@ -105,19 +105,51 @@ class Client(BaseClient):
         self._relay = RelayClient(host,port,self._user)
         self._relay.daemon = True
         self._relay.start()
-
-    def login(self,create_user = True):
-        #TODO implement login, throw error on failure
-        #Dont use this in final, this is just example of what to do
-        if not self.send("USR|{}|{}|{}".format(self._user.name,self._user.password,self._user.display_name)):
+    def get_user(self):
+        return self._user
+    def make_user(self):#create a new account
+        if not self.send(parser.build_raw_response_from_list("USR", [self._user.name, self._user.password,
+                                                                     self._user.display_name])):
             raise ValueError
         msg = self.get_input()
         if msg is None:
+            print("msg is None")
             raise ValueError
-        (tag,args) = parser.parse_header(msg)
-        if tag != "0" and args !=["Ok"]:
-            raise ValueError
+        (tag, args) = parser.parse_header(msg)
+        if tag == "0":
+            return True
+        if tag != "0":
+            print(args)
+            return False
         pass
+
+    def login_as_user(self):#login to an account
+        if not self.send(parser.build_raw_response_from_list("LOG", [self._user.name, self._user.password])):
+            raise ValueError
+        msg = self.get_input()
+        if msg is None:
+            print("msg is None")
+            raise ValueError
+        (tag, args) = parser.parse_header(msg)
+        if tag == "0":
+            return True
+        if tag == "1":
+            print("Invalid credentials")
+            return False
+        if tag == "2":
+            print("Already logged in")
+            return False
+        pass
+
+    def login(self,create_user = True):#make user or login to account
+        #TODO implement login, throw error on failure
+        if create_user == True:
+            return self.make_user()
+        else:
+            return self.login_as_user()
+        #on error throw error
+        pass
+
     def send_message(self,user_to,msg):
         if not self.send(parser.build_raw_response_from_list("MSG",[self._user.name,user_to,msg])):
             raise ValueError
@@ -128,11 +160,9 @@ class Client(BaseClient):
         (tag,args) = parser.parse_header(msg)
         if tag != "0":
             print("tag is",tag,"args:",args)
-            raise ValueError
-        pass
-        pass
+            return False
+        return True
     def print_pending(self):
-        #TODO implement print_pending, throw error on failure
         msgs = self._relay.get_pending_messages()
         for i in msgs:
             i.usr_to =self._user.name
@@ -143,7 +173,7 @@ class Client(BaseClient):
         super().drop()
         self._relay.drop()
 if __name__ == "__main__":
-    a = Client(socket.gethostname(),8094,user.User(input("name >> "),input("password >> "),input("display name >> ")))
+    a = Client(socket.gethostname(),8095,user.User(input("name >> "),input("password >> "),input("display name >> ")))
     print(a.send_message(input("Who >>"),input("What >>")))
     print("sent")
     a.print_pending()

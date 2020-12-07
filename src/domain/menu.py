@@ -1,5 +1,5 @@
 #TODO call client functions
-from domain import user, client
+from domain import user, client,simpleclient
 
 
 class Menu:
@@ -13,8 +13,10 @@ class Menu:
         self._client = None
         if self._host is not None and self._port is not None and user is not None:
             try:
-                self._client = client.Client(self._host, self._port, user, create_user)
+                self._client = simpleclient.Client(self._host, self._port, user, create_user)
                 self._is_ok = True
+                self._user = self._client.get_user()
+
             except:
                 pass
 
@@ -40,19 +42,15 @@ class Menu:
                 self._port = int(input("Port: "))
                 pass
             elif choice == 2:#login
-                print("What is your username?")
-                username = input()
-                print("What is your password?")
-                password = input()
-                display_name = input("display_name: ")
+                username = input("What is your username?")
+                password = input("What is your password?")
+                display_name = input("display_name:")
                 create_user = int(input("Enter 1 to create a new user, anything else to login as existing: ")) == 1
                 self.startup(user.User(username,password,display_name),create_user)
             elif choice == 3:#send a message
-                print("Who are you messaging?")
-                username_to = input()
-                print("What is your message?")
-                message = input()
-                self._client.send_message(username_to, message)
+                username_to = input("Who are you messaging?")
+                message = input("what is your message?")
+                print(self._client.send_message(username_to, message))
             elif choice == 4:#print all pending messages
                 self._client.print_pending()
             elif choice == 5:#disconnect from the server

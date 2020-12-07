@@ -1,4 +1,4 @@
-class User:#define users
+class User: #define users
     def __init__(self, name=None, password=None, display_name=None, history=None):
         self._name = name
         self._password = password
@@ -8,7 +8,8 @@ class User:#define users
         else:
             self._history = history
         self._logged_in = False
-
+    def as_dct(self):
+        return dict(name=self.name,password=self.password,display_name=self.display_name,history=self.history)
     @property
     def logged_in(self):
         return self._logged_in

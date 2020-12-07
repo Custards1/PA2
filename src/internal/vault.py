@@ -1,5 +1,6 @@
 from internal import suser
 import threading
+import json
 class Vault:
     login_tag = "LOG"
     def __init__(self,storage = None):
@@ -29,12 +30,12 @@ class Vault:
             except:
                 return None
     def append(self,user):
-        print("Callin append",self.__str__())
+
         with self._lock:
-            print("adding user",user)
+
             if user.name not in self._storage:
                 self._storage[user.name] = user
-                print("Callin appender",self.__str__())
+
                 return True
             return False
     def exists(self,name):
@@ -43,11 +44,11 @@ class Vault:
     def build_login_user(vaults,tag):
         r = suser.SUser()
         b = r.from_tag(tag)
-        print("a=",b)
+
         b = b == 2
         if b == True:
             if r in vaults.user_data:
-                print("r=",r.name,r.password)
+
                 if not vaults.user_data[r].logged_in:
                     vaults.user_data[r].logged_in = True
                     vaults.connected_user = vaults.user_data[r]
@@ -78,4 +79,24 @@ class Vault:
             com.connected_user = user
             return True
         return False
+    def from_json(self,file):
+        self._storage = dict()
+        with open(file, "r") as data_file:
+            a = data_file.read()
+            objs = json.loads(a,object_hook=as_complex)
+            for i in objs:
+                self._storage[i] = objs[i]
+    def to_json(self):
+        msg = dict()
+        for (j) in self._storage:
+            print(j)
+            if isinstance(self._storage[j],suser.SUser):
+                msg[j]= self._storage[j].as_dct()
+        return json.dumps(msg)
+
+def as_complex(dct):
+    if dct.get('name') is not None and dct.get('password') is not None:
+        return suser.SUser(dct.get('name'),dct.get('password'),dct.get('display_name'),dct.get('history'))
+    return dct
+
 

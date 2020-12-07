@@ -115,7 +115,8 @@ class Client(BaseClient):
         self._relay = RelayClient(host, port, self._user)
         self._relay.daemon = True
         self._relay.start()
-
+    def get_user(self):
+        return self._user
     def make_user(self):#create a new account
         if not self.send(parser.build_raw_response_from_list("USR", [self._user.name, self._user.password,
                                                                      self._user.display_name])):
