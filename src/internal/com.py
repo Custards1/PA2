@@ -7,6 +7,7 @@ from queue import Queue
 
 #Node to communicate with client
 class CommunicationNode(threading.Thread):
+    #loads communication node with data
     def __init__(self, socket=None, hooks=None, user_data=None,connected_user=None):
         super().__init__()
         if socket is None:
@@ -27,10 +28,10 @@ class CommunicationNode(threading.Thread):
         self.add_hook(vault.Vault.login_tag, vault.Vault.build_login_user)
         self.add_hook("RUSR", noop)
         self.add_hook("MSG", message.Message.build)
-
+    #checks if another user is the connected user
     def is_user(self, user):
         return self.connected_user == user
-
+    #gets input from the client
     def get_input(self):
 
         line = bytes()
@@ -55,7 +56,7 @@ class CommunicationNode(threading.Thread):
                     break
 
         return line.decode('utf-8')
-
+    #drops the conncetion
     def drop_connection(self):
 
         try:
@@ -64,7 +65,7 @@ class CommunicationNode(threading.Thread):
         except:
             self._is_connected = False;
             return False
-
+    #sends a message to the client
     def _send(self, msg):
         a = (msg.replace('\n', '') + '\n').encode()
 
@@ -75,13 +76,10 @@ class CommunicationNode(threading.Thread):
         except:
             self._is_connected = False;
             return False
-
-    def add_hookable(self, hookable):
-        self._hooks[hookable[0]] = hookable[1]
-
+    #adds a hook for a specific tag
     def add_hook(self, hook_key, hook, after_hook=None):
         self._hooks[hook_key] = (hook, after_hook)
-
+    #runs a hook for a specific tag with args
     def run_hook(self, hook, args):
         if hook in self._hooks:
             (hooke, _) = self._hooks[hook]
@@ -90,7 +88,7 @@ class CommunicationNode(threading.Thread):
                 (a, b, (c, d)) = b
                 return (a, b, (c, d))
         return (None, None, (None, None))
-
+    #runs a after success hook
     def run_after_hook(self, hook, args):
         if hook in self._hooks:
             (_, hooke) = self._hooks[hook]
@@ -98,7 +96,7 @@ class CommunicationNode(threading.Thread):
                 return hooke(self.user_data, args, self)
             return True
         return False
-
+    #parses and replys to a message
     def _parse(self, msg: str):
         it = 0
         (hook, args) = parser.parse_header(msg)
@@ -125,11 +123,11 @@ class CommunicationNode(threading.Thread):
 
             return True
         return True
-
+    #parses and replys to a first message
     def parse(self, msg: str):
         for line in msg.splitlines(keepends=False):
             return self._parse(line)
-
+    #runs the node
     def run(self):
         while self._is_connected:
             inv = self.get_input()
@@ -139,7 +137,7 @@ class CommunicationNode(threading.Thread):
 
         self.drop_connection()
 
-
+#Communication node for the message relaying
 class CommunicationNodeRelay(CommunicationNode):
     def __init__(self, socket=None, hooks=None, user_data=None,username = None):
         super().__init__(socket, hooks, user_data)
@@ -147,32 +145,32 @@ class CommunicationNodeRelay(CommunicationNode):
         self._lock = threading.Lock()
         self._runnable = True
         self._username= username
-
+    #adds message to pending
     def add_pending(self, msg, to_user):
 
         with self._lock:
             self.user_data.get(to_user).history.append(msg)
-
+    #gets message from pending
     def get_pending(self):
 
         with self._lock:
             return self.user_data[self.connected_user].history
-
+    #returns if any messages are pending
     def any_pending(self) -> bool:
 
         with self._lock:
             return len(self.user_data[self.connected_user].history) != 0
-
+    #clears pending messages
     def clear_pending(self):
 
         with self._lock:
             self.user_data[self.connected_user].history = list()
-
+    #sets if node is ok
     def set_ok(self, ok):
         self._runnable = ok
         if self._runnable == False:
             self.drop_connection()
-
+    #run the node
     def run(self):
 
         while self._runnable:
@@ -195,7 +193,7 @@ class CommunicationNodeRelay(CommunicationNode):
     def drop_connection(self):
         self._runnable = False
         super().drop_connection()
-
+#determin what kind of node to create and start it
 def decifer_communication(sock, user_data,threads_list):
     first_msg = sock.recv(4, socket.MSG_PEEK)
 

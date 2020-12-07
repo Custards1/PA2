@@ -31,3 +31,5 @@ Client-Server multithreading system for a messaging system
     Description: Holds server representation of a user
 ### Name: vault.py
     Description: Holds all users
+# Known bugs
+    Sometimes saving to file and loading in the same server process might hang the menu
