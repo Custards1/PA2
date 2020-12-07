@@ -4,9 +4,8 @@ import socket
 import threading
 from queue import Queue
 
-addr = 8084
 
-
+#Node to communicate with client
 class CommunicationNode(threading.Thread):
     def __init__(self, socket=None, hooks=None, user_data=None,connected_user=None):
         super().__init__()
@@ -215,15 +214,3 @@ def noop(_, _v):
     return (None, False, (0, "Ok"))
 
 
-if __name__ == "__main__":
-    # create an INET, STREAMing socket
-    serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    # bind the socket to a public host, and a well-known port
-    serversocket.bind((socket.gethostname(), addr))
-    # become a server socket
-    serversocket.listen(5)
-    (sock, _) = serversocket.accept()
-    sock.setblocking(True)
-    a = CommunicationNode(socket=sock)
-
-    a.run()

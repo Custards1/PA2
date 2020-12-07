@@ -1,4 +1,7 @@
 # PA2
+# Status
+Works with some minor errors
+# Team members
 Blake Brown, Elie Schooley
 # Description
 Client-Server multithreading system for a messaging system
@@ -10,7 +13,7 @@ Client-Server multithreading system for a messaging system
     Description: Main call for server.
 ## domain
 ### Name: base_message.py
-    Description: 
+    Description: Represents a message
 ### Name: client.py
     Description: functions for the client class.
 ### Name: menu.py
@@ -21,12 +24,10 @@ Client-Server multithreading system for a messaging system
     Description: users for the client
 ## internal
 ### Name: com.py
-    Description: 
-### Name: conversation.py
-    Description: 
+    Description: holds communication classes for the server
 ### Name: message.py
-    Description: 
+    Description: Holds server representation of a message
 ### Name: suser.py
-    Description: 
+    Description: Holds server representation of a user
 ### Name: vault.py
-    Description: 
+    Description: Holds all users
